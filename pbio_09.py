@@ -1,0 +1,49 @@
+import random
+
+def generate_dna_sequence(length):
+    return ''.join(random.choices('ACGT', k=length))
+
+def insert_name(sequence, name):
+    position = random.randint(0, len(sequence))
+    return sequence[:position] + name + sequence[position:]
+
+def calculate_statistics(sequence, name):
+    # Remove name to analyze only nucleotides
+    cleaned_sequence = sequence.replace(name, "")
+    total = len(cleaned_sequence)
+    stats = {
+        'A': cleaned_sequence.count('A') / total * 100,
+        'C': cleaned_sequence.count('C') / total * 100,
+        'G': cleaned_sequence.count('G') / total * 100,
+        'T': cleaned_sequence.count('T') / total * 100
+    }
+    cg_ratio = (stats['C'] + stats['G'])  # Percentage of C and G combined
+    return stats, cg_ratio
+
+def save_to_fasta(file_name, seq_id, description, sequence):
+    with open(file_name, 'w') as file:
+        file.write(f">{seq_id} {description}\n")
+        file.write(sequence + "\n")
+
+def main():
+    length = int(input("Enter the sequence length: "))
+    seq_id = input("Enter the sequence ID: ")
+    description = input("Provide a description of the sequence: ")
+    name = input("Enter your name: ")
+
+    dna = generate_dna_sequence(length)
+    dna_with_name = insert_name(dna, name)
+
+    stats, cg_ratio = calculate_statistics(dna_with_name, name)
+
+    file_name = f"{seq_id}.fasta"
+    save_to_fasta(file_name, seq_id, description, dna_with_name)
+
+    print(f"\nThe sequence was saved to the file {file_name}")
+    print("Sequence statistics:")
+    for nucleotide in ['A', 'C', 'G', 'T']:
+        print(f"{nucleotide}: {stats[nucleotide]:.1f}%")
+    print(f"%CG: {cg_ratio:.1f}")
+
+if __name__ == "__main__":
+    main()
